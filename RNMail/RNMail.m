@@ -68,17 +68,25 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
             [mail setBccRecipients:bccRecipients];
         }
 
+        NSArray *attachments = @[]
+
         if (options[@"attachment"] && options[@"attachment"][@"path"] && options[@"attachment"][@"type"]){
-            NSString *attachmentPath = [RCTConvert NSString:options[@"attachment"][@"path"]];
-            NSString *attachmentType = [RCTConvert NSString:options[@"attachment"][@"type"]];
-            NSString *attachmentName = [RCTConvert NSString:options[@"attachment"][@"name"]];
-            
+            attachments = @[options[@"attachment"]]
+        } else if (options[@"attachments"]) {
+            attachments = [RCTConvert NSArray:options[@"attachments"]];
+        }
+
+        for (NSDictionary *attachment in attachments) {
+            NSString *attachmentPath = [RCTConvert NSString:attachment[@"path"]];
+            NSString *attachmentType = [RCTConvert NSString:attachment[@"type"]];
+            NSString *attachmentName = [RCTConvert NSString:attachment[@"name"]];
+
             NSFileManager *fileManager = [NSFileManager defaultManager];
             if (![fileManager fileExistsAtPath:attachmentPath]){
                 callback(@[[NSString stringWithFormat: @"attachment file with path '%@' does not exist", attachmentPath]]);
                 return;
             }
-            
+
             // Set default filename if not specificed
             if (!attachmentName) {
                 attachmentName = [[attachmentPath lastPathComponent] stringByDeletingPathExtension];
@@ -139,6 +147,7 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
         callback(@[@"not_available"]);
     }
 }
+
 
 #pragma mark MFMailComposeViewControllerDelegate Methods
 

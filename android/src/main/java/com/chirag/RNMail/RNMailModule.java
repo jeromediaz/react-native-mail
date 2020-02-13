@@ -92,7 +92,58 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         Uri p = Uri.fromFile(file);
         i.putExtra(Intent.EXTRA_STREAM, p);
       }
-    }
+    } else if (options.hasKey("attachments" && !options.isNull("attachments")) {
+      ReadableArray r = options.getArray("attachments");
+      int length = r.size();
+      ArrayList<Uri> uris = new ArrayList<Uri>();
+      for (int keyIndex = 0; keyIndex < length; keyIndex++) {
+        ReadableMap clip = r.getMap(keyIndex);
+        if (clip.hasKey("path") && !clip.isNull("path")) {
+          String path = clip.getString("path");
+          Log.d ("RNMail", "Attachment file path: " + path);
+
+          File file = new File(path);
+
+          String name, suffix = "";
+          if (clip.hasKey("name"))
+            name = clip.getString("name");
+          else
+            name = file.getName();
+
+          if (clip.hasKey("type"))
+            suffix = "." + clip.getString("type");
+
+
+          file.setReadable(true, false);
+          if (file.exists()) {
+
+            if (file.length() == 0)
+              Log.d ("RNMail", "Warning, attaching empty file!");
+            // Use the FileProvider to get a content URI
+            try {
+              Uri fileUri = FileProvider.getUriForFile(
+                      getCurrentActivity(),
+                      reactContext.getPackageName() + ".fileprovider",
+                      file);
+              if (fileUri != null) {
+                // Grant temporary read permission to the content URI
+                uris.add(fileUri);
+              }
+            } catch (Exception e) {
+              String message = "There was a problem sharing the file " + file.getName();
+              Log.e("RNMail", message);
+              callback.invoke("error", message + "\n" + e.getMessage());
+            }
+          } else {
+            Log.e("RNMail", "Attachment file does not exist");
+          }
+        }
+      }
+      i.setType("*/*");
+      i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+      i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+    })
 
     PackageManager manager = reactContext.getPackageManager();
     List<ResolveInfo> list = manager.queryIntentActivities(i, 0);
