@@ -143,7 +143,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
       i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
       i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-    })
+    }
 
     PackageManager manager = reactContext.getPackageManager();
     List<ResolveInfo> list = manager.queryIntentActivities(i, 0);
