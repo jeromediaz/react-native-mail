@@ -92,7 +92,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         Uri p = Uri.fromFile(file);
         i.putExtra(Intent.EXTRA_STREAM, p);
       }
-    } else if (options.hasKey("attachments" && !options.isNull("attachments")) {
+    } else if (options.hasKey("attachments") && !options.isNull("attachments")) {
       ReadableArray r = options.getArray("attachments");
       int length = r.size();
       ArrayList<Uri> uris = new ArrayList<Uri>();
