@@ -68,10 +68,10 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
             [mail setBccRecipients:bccRecipients];
         }
 
-        NSArray *attachments = @[]
+        NSArray *attachments = @[];
 
         if (options[@"attachment"] && options[@"attachment"][@"path"] && options[@"attachment"][@"type"]){
-            attachments = @[options[@"attachment"]]
+            attachments = @[options[@"attachment"]];
         } else if (options[@"attachments"]) {
             attachments = [RCTConvert NSArray:options[@"attachments"]];
         }
